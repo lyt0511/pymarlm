@@ -1,6 +1,6 @@
-from smac.env.starcraft2.starcraft2 import StarCraft2Env
-from smac.env.starcraft2.starcraft2 import races, difficulties, Direction
-from smac.env.starcraft2.starcraft2 import actions as actions_api
+from envs.starcraft2.starcraft2 import StarCraft2Env
+from envs.starcraft2.starcraft2 import races, difficulties, Direction
+from envs.starcraft2.starcraft2 import actions as actions_api
 from operator import attrgetter
 from copy import deepcopy
 import numpy as np
