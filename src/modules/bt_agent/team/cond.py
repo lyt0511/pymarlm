@@ -3,8 +3,6 @@ import numpy as np
 
 from modules.bt_agent.team.node import Node
 
-import pdb
-
 # selector节点下的条件应该是互斥的？？？
 
 class CanEvade(Node):
@@ -13,6 +11,11 @@ class CanEvade(Node):
     
     def update(self):
         state = self.gb.state
+        # agent dead
+        for idx in self.bb.group:
+            if state[idx*self.eb.state_ally_feat_size] == 0:
+                return py_trees.common.Status.FAILURE
+
         # 1 see anemy, 2 hp < evade hp, and is 3 under attack can evade
         if self.bb.target_visible == -1:
             return py_trees.common.Status.FAILURE
@@ -47,32 +50,45 @@ class CanKite(Node):
     
     def update(self):
         state = self.gb.state
+        # agent dead
+        for idx in self.bb.group:
+            if state[idx*self.eb.state_ally_feat_size] == 0:
+                return py_trees.common.Status.FAILURE
+
         for idx in self.bb.group:
             # hp < kite_hp then can kite
             # print ('{} agent hp: {}'.format(idx, state[idx*self.eb.state_ally_feat_size]))
             if state[idx*self.eb.state_ally_feat_size] < self.gb.kite_hp and self.bb.kite_action_type == 'attack':
-                self.bb.kite_action_type == 'move'
+                self.bb.kite_action_type = 'move'
                 return py_trees.common.Status.SUCCESS
         
         return py_trees.common.Status.FAILURE
 
 
 class CanAttack(Node):
-    def __init__(self, namespace):
+    def __init__(self, namespace, unit_mode):
         super().__init__(namespace)
+        self.unit_mode = unit_mode
 
     def update(self):
         state = self.gb.state
+        # agent dead
         for idx in self.bb.group:
-            # hp < kite_hp then judge whether to kite
-            # print ('{} agent hp: {}'.format(idx, state[idx*self.eb.state_ally_feat_size]))
-            if state[idx*self.eb.state_ally_feat_size] < self.gb.evade_hp:                
-                if self.bb.kite_action_type != 'move':
-                    return py_trees.common.Status.FAILURE
+            if state[idx*self.eb.state_ally_feat_size] == 0:
+                return py_trees.common.Status.FAILURE
+
+        # only long-hand agent needs to kite
+        if self.unit_mode == 'long':
+            for idx in self.bb.group:
+                # hp < kite_hp then judge whether to kite
+                # print ('{} agent hp: {}'.format(idx, state[idx*self.eb.state_ally_feat_size]))
+                if state[idx*self.eb.state_ally_feat_size] < self.gb.kite_hp:                
+                    if self.bb.kite_action_type != 'move':
+                        return py_trees.common.Status.FAILURE
         
         if self.bb.target != -1:
             # refer to kite action, set the kite action type to attack
-            self.bb.kite_action_type == 'attack'
+            self.bb.kite_action_type = 'attack'
             return py_trees.common.Status.SUCCESS
         else:
             return py_trees.common.Status.FAILURE
@@ -88,11 +104,16 @@ class CanMove(Node):
             return py_trees.common.Status.FAILURE
         
         state = self.gb.state
+        # agent dead
         for idx in self.bb.group:
-            if state[idx*self.eb.state_ally_feat_size] < self.gb.evade_hp:
+            if state[idx*self.eb.state_ally_feat_size] == 0:
                 return py_trees.common.Status.FAILURE
 
-        # defatul move to east
+        # for idx in self.bb.group:
+        #     if state[idx*self.eb.state_ally_feat_size] < self.gb.evade_hp:
+        #         return py_trees.common.Status.FAILURE
+
+        # defatul move to west
         self.bb.move_direction = 'w'
 
         return py_trees.common.Status.SUCCESS
