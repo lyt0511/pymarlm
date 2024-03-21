@@ -33,7 +33,7 @@ python src/main.py --config=qmix_multi --env-config=sc2_multi with env_args.map_
 ```
 
 ## Edit map
-For the detailed description, read the [Map Edit](envs/starcraft2/maps/smac_map_edit.md). 
+For the detailed description, read the [Map Edit](src/envs/starcraft2/maps/smac_map_edit.md). 
 
 ## Save replay
 
