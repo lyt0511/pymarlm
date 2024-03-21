@@ -32,5 +32,8 @@ The requirements.txt file can be used to install the necessary packages into a v
 python src/main.py --config=qmix_multi --env-config=sc2_multi with env_args.map_name=2s3z_multi
 ```
 
+## Edit map
+For the detailed description, read the [Map Edit](envs/starcraft2/maps/smac_map_edit.md). 
+
 ## Save replay
 
